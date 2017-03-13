@@ -2,9 +2,13 @@ package com.example.vlc_photosensor;
 
 import java.util.List;
 
+import android.content.Context;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -14,71 +18,91 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
-public class MainActivity extends AppCompatActivity 
+public class MainActivity extends AppCompatActivity implements SensorEventListener
 {
     private Button btnStart;
     private TextView HWgetText;
-    private static final String TAG = "SensorApi";
+    private static final String TAG = "MApi";
+    private Context mcontext;
     
     //SensorEvent sensorValue;
-    SensorManager senMgr;
-    Sensor sensor;
+    private SensorManager mSensorManager;
+    private Sensor mSensor;
+    private List<Sensor> sensorLight;
+    
+    Thread t1 = new Thread(new Runnable() {
+        public void run() 
+        {
+        	Log.d(TAG, "Initialising sensors");
+        	if(initSensor() == 0)
+        		Log.d(TAG, "sensors initialised");
+        	else
+        		Log.d(TAG, "sensors didn't initialised properly");
+        	
+        	System.out.println(sensorLight);
+        	System.out.println(mSensor);
+        }
+    });
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.mcontext = getApplicationContext();  
         Log.d(TAG, "Application started");
         HWgetText = (TextView)findViewById(R.id.textViewName);
-        
-        List<Sensor> sensorLight;
-        senMgr = (SensorManager) getSystemService(SENSOR_SERVICE);
-        sensorLight = senMgr.getSensorList(Sensor.TYPE_LIGHT);
-       
-        /*btnStart = (Button) findViewById(R.id.btnStart);
+        btnStart = (Button) findViewById(R.id.btnStart);
         
         btnStart.setOnClickListener(new View.OnClickListener() 
         {
             @Override
             public void onClick(View arg0) 
             {
-            	Log.d(TAG, "Initialising sensors");
-                start();
-                Log.d(TAG, "sensors initialised");
+            	t1.run();
             }
-         });*/
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) 
-    {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) 
-    {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+         });
     }
     
     @Override
     protected void onResume() 
     {
     	super.onResume();
+    	if(mSensor != null)
+    	mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
     }
 
     @Override
     protected void onPause()
     { 
+    	if(mSensor != null)
+    	mSensorManager.unregisterListener(this);
     	super.onPause();
     }
     
-    public void start()
-    {}
+    public int initSensor()
+    {
+    	mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        sensorLight = mSensorManager.getSensorList(Sensor.TYPE_LIGHT);
+        if (sensorLight != null)
+    	{
+        	mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        	mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
+    		return 0;
+    	}
+        else
+        	return 1;
+    }
+
+	@Override
+	public void onAccuracyChanged(Sensor sensor, int accuracy)
+	{
+		Log.e(TAG,"Sensor's accuracy changed, it might cause problems");
+	}
+
+	@Override
+	public void onSensorChanged(SensorEvent event)
+	{
+		System.out.println("current value::" +  event.values[0]);
+	}
 }
