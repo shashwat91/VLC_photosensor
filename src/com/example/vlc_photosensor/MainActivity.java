@@ -4,16 +4,35 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity 
 {
 
+    private Button btnStart;
+    private TextView HWgetText;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        
+        HWgetText = (TextView)findViewById(R.id.textViewName);
+        btnStart = (Button) findViewById(R.id.btnStart);
+        
+        btnStart.setOnClickListener(new View.OnClickListener() 
+        {
+            @Override
+            public void onClick(View arg0) 
+            {
+                start();
+            }
+         });
+        displayValues();
     }
 
     @Override
@@ -36,4 +55,26 @@ public class MainActivity extends AppCompatActivity
         }
         return super.onOptionsItemSelected(item);
     }
+    
+   public void start()
+   {
+	  
+   }
+   
+   public void displayValues()
+   {
+	   try 
+	   {
+		   HWgetText.setText(String.valueOf(134));
+		   Thread.sleep(1000);
+		   HWgetText.setText(String.valueOf(133));
+		   Thread.sleep(1000);
+		   HWgetText.setText(String.valueOf(132));
+		   Thread.sleep(1000);
+	   } 
+	   catch (InterruptedException e) 
+	   {
+		e.printStackTrace();
+	   }
+   }
 }
