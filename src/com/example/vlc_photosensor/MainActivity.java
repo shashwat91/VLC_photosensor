@@ -99,9 +99,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (sensorLight != null)
     	{
         	mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        	//mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
-        	mSensorManager.registerListener(this, mSensor, Sensor.REPORTING_MODE_CONTINUOUS);
-        	//run();
+        	mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        	//mSensorManager.registerListener(this, mSensor, Sensor.SENSOR_DELAY_FASTEST);
     		return 0;
     	}
         else
@@ -117,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 	@Override
 	public void onSensorChanged(SensorEvent event)
 	{
-		//System.out.println("current value:" +  event.values[0]+":"+event.timestamp);
 		sensorValue = event.values[0];
 	}
 	
