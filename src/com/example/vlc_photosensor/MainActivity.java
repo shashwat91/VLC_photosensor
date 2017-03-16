@@ -8,22 +8,22 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener
+public class MainActivity extends AppCompatActivity implements SensorEventListener, Runnable
 {
     private Button btnStart;
     private TextView HWgetText;
     private static final String TAG = "MApi";
     private Context mcontext;
+    private static final int PERIOD=5000;
+	private View root=null;
+	SensorEventListener event;
     
     //SensorEvent sensorValue;
     private SensorManager mSensorManager;
@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Log.d(TAG, "Application started");
         HWgetText = (TextView)findViewById(R.id.textViewName);
         btnStart = (Button) findViewById(R.id.btnStart);
+        root=findViewById(android.R.id.content);
         
         btnStart.setOnClickListener(new View.OnClickListener() 
         {
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     { 
     	if(mSensor != null)
     	mSensorManager.unregisterListener(this);
+    	root.removeCallbacks(this);
     	super.onPause();
     }
     
@@ -87,7 +89,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (sensorLight != null)
     	{
         	mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        	mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        	//mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
+        	mSensorManager.registerListener(event, mSensor, Sensor.REPORTING_MODE_CONTINUOUS);
+        	//run();
     		return 0;
     	}
         else
@@ -103,6 +107,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 	@Override
 	public void onSensorChanged(SensorEvent event)
 	{
-		System.out.println("current value::" +  event.values[0]);
+		System.out.println("current value:" +  event.values[0]+":"+event.timestamp);
+	}
+
+	@Override
+	public void run()
+	{
+		System.out.println("Periodic data:"+mSensor);
+    	root.postDelayed(this, PERIOD);	
+	}
+	
+	public void sensorValue()
+	{
+		
 	}
 }
