@@ -22,13 +22,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView HWgetText;
     private static final String TAG = "MApi";
     private Context mcontext;
-    private static final int PERIOD=5000;
+    private static final int PERIOD=1;
 	private Handler handler;
 	private boolean initialising = true;
 	//SensorEvent sensorValue;
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private List<Sensor> sensorLight;
+    public float sensorValue=0;
     
 	private final Runnable processSensors = new Runnable() 
 	{
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 				initialising = false;
 			}
 			
-			System.out.println("Periodic data:"+mSensor);
+			System.out.println("Periodic data:"+sensorValue);
 	        handler.postDelayed(this, PERIOD);
 	    }
 	};
@@ -116,7 +117,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 	@Override
 	public void onSensorChanged(SensorEvent event)
 	{
-		System.out.println("current value:" +  event.values[0]+":"+event.timestamp);
+		//System.out.println("current value:" +  event.values[0]+":"+event.timestamp);
+		sensorValue = event.values[0];
 	}
 	
 }
