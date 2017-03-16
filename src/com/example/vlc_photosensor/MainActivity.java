@@ -8,6 +8,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -15,34 +16,35 @@ import android.widget.Button;
 import android.widget.TextView;
 
 
-public class MainActivity extends AppCompatActivity implements SensorEventListener, Runnable
+public class MainActivity extends AppCompatActivity implements SensorEventListener
 {
     private Button btnStart;
     private TextView HWgetText;
     private static final String TAG = "MApi";
     private Context mcontext;
     private static final int PERIOD=5000;
-	private View root=null;
-	SensorEventListener event;
-    
-    //SensorEvent sensorValue;
+	private Handler handler;
+	private boolean initialising = true;
+	//SensorEvent sensorValue;
     private SensorManager mSensorManager;
     private Sensor mSensor;
     private List<Sensor> sensorLight;
     
-    Thread t1 = new Thread(new Runnable() {
-        public void run() 
-        {
-        	Log.d(TAG, "Initialising sensors");
-        	if(initSensor() == 0)
-        		Log.d(TAG, "sensors initialised");
-        	else
-        		Log.d(TAG, "sensors didn't initialised properly");
-        	
-        	System.out.println(sensorLight);
-        	System.out.println(mSensor);
-        }
-    });
+	private final Runnable processSensors = new Runnable() 
+	{
+		@Override
+		public void run()
+		{
+			if(initialising)
+			{
+				initSensor();
+				initialising = false;
+			}
+			
+			System.out.println("Periodic data:"+mSensor);
+	        handler.postDelayed(this, PERIOD);
+	    }
+	};
     
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -53,14 +55,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Log.d(TAG, "Application started");
         HWgetText = (TextView)findViewById(R.id.textViewName);
         btnStart = (Button) findViewById(R.id.btnStart);
-        root=findViewById(android.R.id.content);
+        handler = new Handler();
         
         btnStart.setOnClickListener(new View.OnClickListener() 
         {
             @Override
             public void onClick(View arg0) 
             {
-            	t1.run();
+            	//t1.run();
+            	processSensors.run();
             }
          });
     }
@@ -70,15 +73,21 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     {
     	super.onResume();
     	if(mSensor != null)
-    	mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
+    	{
+    		handler.post(processSensors);
+    	}
+    	
     }
 
     @Override
     protected void onPause()
     { 
     	if(mSensor != null)
-    	mSensorManager.unregisterListener(this);
-    	root.removeCallbacks(this);
+    	{
+    		handler.removeCallbacks(processSensors);
+    		mSensorManager.unregisterListener(this);
+    		initialising = true;
+    	}
     	super.onPause();
     }
     
@@ -90,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     	{
         	mSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         	//mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
-        	mSensorManager.registerListener(event, mSensor, Sensor.REPORTING_MODE_CONTINUOUS);
+        	mSensorManager.registerListener(this, mSensor, Sensor.REPORTING_MODE_CONTINUOUS);
         	//run();
     		return 0;
     	}
@@ -109,16 +118,5 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 	{
 		System.out.println("current value:" +  event.values[0]+":"+event.timestamp);
 	}
-
-	@Override
-	public void run()
-	{
-		System.out.println("Periodic data:"+mSensor);
-    	root.postDelayed(this, PERIOD);	
-	}
 	
-	public void sensorValue()
-	{
-		
-	}
 }
