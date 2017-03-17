@@ -31,22 +31,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private List<Sensor> sensorLight;
     public float sensorValue=0;
     
-	private final Runnable processSensors = new Runnable() 
-	{
-		@Override
-		public void run()
-		{
-			if(initialising)
-			{
-				initSensor();
-				initialising = false;
-			}
-			
-			System.out.println("Periodic data:"+sensorValue);
-	        handler.postDelayed(this, PERIOD);
-	    }
-	};
-    
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -56,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Log.d(TAG, "Application started");
         HWgetText = (TextView)findViewById(R.id.textViewName);
         btnStart = (Button) findViewById(R.id.btnStart);
-        handler = new Handler();
+        //handler = new Handler();
         
         btnStart.setOnClickListener(new View.OnClickListener() 
         {
@@ -64,7 +48,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             public void onClick(View arg0) 
             {
             	//t1.run();
-            	processSensors.run();
+            	//processSensors.run();
+            	initSensor();
             }
          });
     }
@@ -75,9 +60,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     	super.onResume();
     	if(mSensor != null)
     	{
-    		handler.post(processSensors);
+    		//handler.post(processSensors);
+    		mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_FASTEST);
     	}
-    	
     }
 
     @Override
@@ -85,7 +70,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     { 
     	if(mSensor != null)
     	{
-    		handler.removeCallbacks(processSensors);
+    		//handler.removeCallbacks(processSensors);
+    		
     		mSensorManager.unregisterListener(this);
     		initialising = true;
     	}
@@ -116,7 +102,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 	@Override
 	public void onSensorChanged(SensorEvent event)
 	{
-		sensorValue = event.values[0];
+		//sensorValue = event.values[0];
+		System.out.println("Sensor Value:"+event.values[0]);
 	}
 	
 }
