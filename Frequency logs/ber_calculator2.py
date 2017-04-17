@@ -13,14 +13,14 @@ def takeClosest(myList, myNumber):
     return before
 
 cwd = os.getcwd()
-logFileName = 'valvue_hold_20.csv'
-pathToFile = cwd+'/hz_20/'+logFileName
+logFileName = 'value_hold_70.csv'
+pathToFile = cwd+'/hz_70/'+logFileName
 logFile  = open(pathToFile, 'r+')
 
-freq = 20
+freq = 70
 sampling_freq = freq * 1
 sampling_interval = round(1.0/sampling_freq,3)
-first_sample = 9.192
+first_sample = 35.966
 
 print "File open:: ", logFileName
 print "Sampling frequency:: %d"%sampling_freq
@@ -73,12 +73,16 @@ print "Correct bits:: %d"%corr_bits
 print "Bit error rate = %.2f"%bit_err
 
 #Data aquired and sample points 
-plt.title('Acuired data and sampling points')
-plt.xlabel('Seconds')
+plt.title('Acuired data and sampling points, '+logFileName)
+plt.xlabel('Time (sec)')
 plt.ylabel('Value')
 plt.plot(time,bit,'b')
 plt.plot(sample,xs,'rx')
 plt.ylim([0,1.5])
-plt.xlim([13,14])
+plt.legend(['Acquired data', 'Sample points'])
+plt.xlim([36,37])
 
+#mng = plt.get_current_fig_manager()
+#mng.full_screen_toggle()
 plt.show()
+#plt.savefig('20hz_sampled_data.svg')
