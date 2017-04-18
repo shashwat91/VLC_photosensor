@@ -17,3 +17,7 @@ Bit error-rate in ZERO uptil 20Hz, and signal is decode-able uptil 50Hz. After 5
 
 Number of values given by light sensor in 1 second are recorded. These values follow transmiting frequency uptil 60 Hz, but at 60Hz samples are scattered.
 On observation correct bits can be seen uptil 60Hz, it is reprented in [Value_change(samples).svg](https://github.com/shashwat91/VLC_photosensor/blob/packet/Results/Value_change(samples).svg).
+
+## Samples Acquired
+
+Figure [samples_perSecond.svg](https://github.com/shashwat91/VLC_photosensor/blob/packet/Results/samples_perSecond.svg) show the number of samples recorded by phone's light sensor in one second interval for different frequencies. For a system to work number of samples should be atleast equal to bit-rate. Uptil 60Hz bit-rate this criteria is fulfilled. For higher frequencies, message became undecoad-able due to very less samples.
